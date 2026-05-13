@@ -14,7 +14,7 @@ namespace CSharp_68PM1_PhamGiaBach_4000268
         {
             string email = txtEmail.Text;
             string password = txtPassword.Text;
-
+            string studentEmail ="4000268@st.huce.edu.vn"
             string studentMSSV = "4000268";
 
             if (email == studentEmail && password == studentMSSV)
