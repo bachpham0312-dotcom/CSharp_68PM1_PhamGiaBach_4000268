@@ -1,0 +1,11 @@
+C:\Users\PC\Documents\C# Winform\CSharp_68PM1_PhamGiaBach_4000268\CSharp_68PM1_PhamGiaBach_4000268\bin\Debug\CSharp_68PM1_PhamGiaBach_4000268.exe.config
+C:\Users\PC\Documents\C# Winform\CSharp_68PM1_PhamGiaBach_4000268\CSharp_68PM1_PhamGiaBach_4000268\bin\Debug\CSharp_68PM1_PhamGiaBach_4000268.exe
+C:\Users\PC\Documents\C# Winform\CSharp_68PM1_PhamGiaBach_4000268\CSharp_68PM1_PhamGiaBach_4000268\bin\Debug\CSharp_68PM1_PhamGiaBach_4000268.pdb
+C:\Users\PC\Documents\C# Winform\CSharp_68PM1_PhamGiaBach_4000268\CSharp_68PM1_PhamGiaBach_4000268\obj\Debug\CSharp_68PM1_PhamGiaBach_4000268.csproj.AssemblyReference.cache
+C:\Users\PC\Documents\C# Winform\CSharp_68PM1_PhamGiaBach_4000268\CSharp_68PM1_PhamGiaBach_4000268\obj\Debug\CSharp_68PM1_PhamGiaBach_4000268.Form1.resources
+C:\Users\PC\Documents\C# Winform\CSharp_68PM1_PhamGiaBach_4000268\CSharp_68PM1_PhamGiaBach_4000268\obj\Debug\CSharp_68PM1_PhamGiaBach_4000268.Properties.Resources.resources
+C:\Users\PC\Documents\C# Winform\CSharp_68PM1_PhamGiaBach_4000268\CSharp_68PM1_PhamGiaBach_4000268\obj\Debug\CSharp_68PM1_PhamGiaBach_4000268.csproj.GenerateResource.cache
+C:\Users\PC\Documents\C# Winform\CSharp_68PM1_PhamGiaBach_4000268\CSharp_68PM1_PhamGiaBach_4000268\obj\Debug\CSharp_68PM1_PhamGiaBach_4000268.csproj.CoreCompileInputs.cache
+C:\Users\PC\Documents\C# Winform\CSharp_68PM1_PhamGiaBach_4000268\CSharp_68PM1_PhamGiaBach_4000268\obj\Debug\CSharp_68PM1_PhamGiaBach_4000268.exe
+C:\Users\PC\Documents\C# Winform\CSharp_68PM1_PhamGiaBach_4000268\CSharp_68PM1_PhamGiaBach_4000268\obj\Debug\CSharp_68PM1_PhamGiaBach_4000268.pdb
+C:\Users\PC\Documents\C# Winform\CSharp_68PM1_PhamGiaBach_4000268\CSharp_68PM1_PhamGiaBach_4000268\obj\Debug\QLSV.QuanLySinhVien.resources
