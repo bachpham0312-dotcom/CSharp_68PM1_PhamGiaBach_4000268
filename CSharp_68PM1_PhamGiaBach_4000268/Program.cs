@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace CSharp_68PM1_PhamGiaBach_4000268
+namespace QuanLySinhVien
 {
     internal static class Program
     {
@@ -9,8 +9,10 @@ namespace CSharp_68PM1_PhamGiaBach_4000268
         static void Main()
         {
             Application.EnableVisualStyles();
+
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new QuanLySinhVien());
+
+            Application.Run(new QLSV.QuanLySinhVien());
         }
     }
 }

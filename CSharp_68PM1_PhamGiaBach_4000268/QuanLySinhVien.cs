@@ -1,147 +1,109 @@
 ﻿using System;
-using System.Drawing;
 using System.Windows.Forms;
 
-namespace CSharp_68PM1_PhamGiaBach_4000268
+namespace QLSV
 {
     public partial class QuanLySinhVien : Form
     {
         public QuanLySinhVien()
         {
             InitializeComponent();
-
-            TaoGiaoDienSinhVien();
+            LoadDuLieuMau();
         }
 
-        private void TaoGiaoDienSinhVien()
+        private void LoadDuLieuMau()
         {
-            Label lblMaSV = new Label();
-            lblMaSV.Text = "Mã sinh viên";
-            lblMaSV.Location = new Point(30, 60);
+            dgvSinhVien.Rows.Add("1", "Hieu", "Nam", "11/03/2026", "68PM1");
+            dgvSinhVien.Rows.Add("2", "Nguyễn Văn B", "Nam", "11/03/2026", "68PM2");
+            dgvSinhVien.Rows.Add("3", "Trần Văn C", "Nam", "21/03/2026", "68PM2");
+        }
 
-            TextBox txtMaSV = new TextBox();
-            txtMaSV.Location = new Point(30, 90);
-            txtMaSV.Width = 250;
+        
 
-            Label lblHoTen = new Label();
-            lblHoTen.Text = "Họ và tên";
-            lblHoTen.Location = new Point(30, 140);
+        private void btnThem_Click(object sender, EventArgs e)
+        {
+            dgvSinhVien.Rows.Add(txtMaSV.Text, txtHoTen.Text, cboGioiTinh.Text, dtNgaySinh.Text, cboLop.Text);
+            MessageBox.Show("Thêm sinh viên thành công");
+        }
 
-            TextBox txtHoTen = new TextBox();
-            txtHoTen.Location = new Point(30, 170);
-            txtHoTen.Width = 250;
-
-            Label lblNgaySinh = new Label();
-            lblNgaySinh.Text = "Ngày sinh";
-            lblNgaySinh.Location = new Point(30, 220);
-
-            DateTimePicker dtNgaySinh = new DateTimePicker();
-            dtNgaySinh.Location = new Point(30, 250);
-            dtNgaySinh.Width = 250;
-
-            Label lblGioiTinh = new Label();
-            lblGioiTinh.Text = "Giới tính";
-            lblGioiTinh.Location = new Point(30, 300);
-
-            ComboBox cboGioiTinh = new ComboBox();
-            cboGioiTinh.Location = new Point(30, 330);
-            cboGioiTinh.Width = 250;
-
-            cboGioiTinh.Items.Add("Nam");
-            cboGioiTinh.Items.Add("Nữ");
-
-            Label lblLop = new Label();
-            lblLop.Text = "Lớp";
-            lblLop.Location = new Point(30, 380);
-
-            ComboBox cboLop = new ComboBox();
-            cboLop.Location = new Point(30, 410);
-            cboLop.Width = 250;
-
-            cboLop.Items.Add("68PM1");
-            cboLop.Items.Add("68PM2");
-
-            Button btnThem = new Button();
-            btnThem.Text = "Thêm";
-            btnThem.Location = new Point(30, 500);
-
-            Button btnSua = new Button();
-            btnSua.Text = "Sửa";
-            btnSua.Location = new Point(120, 500);
-
-            Button btnXoa = new Button();
-            btnXoa.Text = "Xóa";
-            btnXoa.Location = new Point(210, 500);
-
-            DataGridView dgv = new DataGridView();
-
-            dgv.Location = new Point(350, 60);
-            dgv.Size = new Size(700, 400);
-
-            dgv.ColumnCount = 5;
-
-            dgv.Columns[0].Name = "Mã SV";
-            dgv.Columns[1].Name = "Họ tên";
-            dgv.Columns[2].Name = "Ngày sinh";
-            dgv.Columns[3].Name = "Giới tính";
-            dgv.Columns[4].Name = "Lớp";
-
-            dgv.Rows.Add("1", "Nguyễn Văn A", "11/03/2026", "Nam", "68PM1");
-
-            btnThem.Click += (s, e) =>
+        private void btnXoa_Click(object sender, EventArgs e)
+        {
+            if (dgvSinhVien.CurrentRow != null)
             {
-                dgv.Rows.Add(
-                    txtMaSV.Text,
-                    txtHoTen.Text,
-                    dtNgaySinh.Text,
-                    cboGioiTinh.Text,
-                    cboLop.Text
-                );
-            };
+                dgvSinhVien.Rows.Remove(dgvSinhVien.CurrentRow);
+                MessageBox.Show("Xóa sinh viên thành công");
+            }
+        }
 
-            btnXoa.Click += (s, e) =>
+        private void btnLamMoi_Click(object sender, EventArgs e)
+        {
+            txtMaSV.Clear();
+            txtHoTen.Clear();
+            cboGioiTinh.SelectedIndex = -1;
+            cboLop.SelectedIndex = -1;
+            dtNgaySinh.Value = DateTime.Now;
+        }
+
+        private void btnSua_Click(object sender, EventArgs e)
+        {
+            if (dgvSinhVien.CurrentRow != null)
             {
-                if (dgv.CurrentRow != null)
+                dgvSinhVien.CurrentRow.Cells[0].Value = txtMaSV.Text;
+                dgvSinhVien.CurrentRow.Cells[1].Value = txtHoTen.Text;
+                dgvSinhVien.CurrentRow.Cells[2].Value = cboGioiTinh.Text;
+                dgvSinhVien.CurrentRow.Cells[3].Value = dtNgaySinh.Text;
+                dgvSinhVien.CurrentRow.Cells[4].Value = cboLop.Text;
+                MessageBox.Show("Sửa sinh viên thành công");
+            }
+        }
+
+        private void dgvSinhVien_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                DataGridViewRow row = dgvSinhVien.Rows[e.RowIndex];
+                txtMaSV.Text = row.Cells[0].Value?.ToString();
+                txtHoTen.Text = row.Cells[1].Value?.ToString();
+                cboGioiTinh.Text = row.Cells[2].Value?.ToString();
+                dtNgaySinh.Text = row.Cells[3].Value?.ToString();
+                cboLop.Text = row.Cells[4].Value?.ToString();
+            }
+        }
+
+        private void btnTim_Click(object sender, EventArgs e)
+        {
+            string tukhoa = txtTimKiem.Text.ToLower();
+            foreach (DataGridViewRow row in dgvSinhVien.Rows)
+            {
+                if (row.Cells[1].Value != null)
                 {
-                    dgv.Rows.Remove(dgv.CurrentRow);
+                    string hoten = row.Cells[1].Value.ToString().ToLower();
+                    if (hoten.Contains(tukhoa))
+                    {
+                        row.Selected = true;
+                        dgvSinhVien.FirstDisplayedScrollingRowIndex = row.Index;
+                        return;
+                    }
                 }
-            };
-
-            this.Controls.Add(lblMaSV);
-            this.Controls.Add(txtMaSV);
-
-            this.Controls.Add(lblHoTen);
-            this.Controls.Add(txtHoTen);
-
-            this.Controls.Add(lblNgaySinh);
-            this.Controls.Add(dtNgaySinh);
-
-            this.Controls.Add(lblGioiTinh);
-            this.Controls.Add(cboGioiTinh);
-
-            this.Controls.Add(lblLop);
-            this.Controls.Add(cboLop);
-
-            this.Controls.Add(btnThem);
-            this.Controls.Add(btnSua);
-            this.Controls.Add(btnXoa);
-
-            this.Controls.Add(dgv);
+            }
+            MessageBox.Show("Không tìm thấy sinh viên");
         }
 
-        private void quảnLýSinhViênToolStripMenuItem_Click(object sender, EventArgs e)
-        {
+  
 
+        private void menuLopHoc_Click(object sender, EventArgs e)
+        {
+            
+            MessageBox.Show("Bạn vừa nhấn vào Quản lý Lớp Học");
         }
 
-        private void quảnLýLớpHọcToolStripMenuItem_Click(object sender, EventArgs e)
+        private void menuDangXuat_Click(object sender, EventArgs e)
         {
-
-        }
-
-        private void đăngXuấtToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.Close();
+            DialogResult result = MessageBox.Show("Bạn có muốn đăng xuất không?", "Thông báo", MessageBoxButtons.YesNo);
+            if (result == DialogResult.Yes)
+            {
+                this.Close();
+            }
         }
     }
 }
