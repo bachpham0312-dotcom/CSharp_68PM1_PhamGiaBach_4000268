@@ -197,6 +197,48 @@ namespace Quanlisinhvien
                 MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        private void btnXoa_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtMaSV.Text))
+            {
+                MessageBox.Show("Vui lòng chọn sinh viên cần xóa.", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (MessageBox.Show($"Bạn có chắc muốn xóa sinh viên '{txtHoTen.Text}'?",
+                "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
+            try
+            {
+                db = new DataClasses1DataContext();
+                var sv = db.sinhviens.FirstOrDefault(s => s.masv == txtMaSV.Text.Trim());
+                if (sv == null)
+                {
+                    MessageBox.Show("Không tìm thấy sinh viên.", "Thông báo",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                db.sinhviens.DeleteOnSubmit(sv);
+                db.SubmitChanges();
+                MessageBox.Show("Xóa sinh viên thành công!", "Thành công",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LoadDanhSach(txtTimKiem.Text);
+                LamMoiForm();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnLamMoi_Click(object sender, EventArgs e) => LamMoiForm();
+
+        private void btnTim_Click(object sender, EventArgs e)
+        {
+            currentPage = 1;
+            LoadDanhSach(txtTimKiem.Text);
+        }
+
 
     }
 }
