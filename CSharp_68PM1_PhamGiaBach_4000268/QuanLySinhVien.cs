@@ -101,7 +101,29 @@ namespace Quanlisinhvien
             if (cboGioiTinh.Items.Count > 0) cboGioiTinh.SelectedIndex = 0;
             if (cboLop.Items.Count > 0) cboLop.SelectedIndex = 0;
         }
-
+        private void dgvSinhVien_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            var row = dgvSinhVien.Rows[e.RowIndex];
+            txtMaSV.Text = row.Cells[0].Value?.ToString();
+            txtMaSV.ReadOnly = true;
+            txtMaSV.BackColor = System.Drawing.Color.FromArgb(230, 230, 230);
+            txtHoTen.Text = row.Cells[1].Value?.ToString();
+            cboGioiTinh.Text = row.Cells[2].Value?.ToString();
+            string nsStr = row.Cells[3].Value?.ToString();
+            if (DateTime.TryParseExact(nsStr, "dd/MM/yyyy",
+                CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt))
+                dtNgaySinh.Value = dt;
+            // Chọn lớp tương ứng
+            string maLop = row.Cells[4].Value?.ToString();
+            try
+            {
+                db = new DataClasses1DataContext();
+                var lop = db.lophocs.FirstOrDefault(l => l.malop == maLop);
+                if (lop != null) cboLop.SelectedValue = lop.id;
+            }
+            catch { }
+        }
         private void btnThem_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtMaSV.Text) || string.IsNullOrWhiteSpace(txtHoTen.Text))
@@ -141,5 +163,40 @@ namespace Quanlisinhvien
                 MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+        private void btnSua_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtMaSV.Text))
+            {
+                MessageBox.Show("Vui lòng chọn sinh viên cần sửa.", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            try
+            {
+                db = new DataClasses1DataContext();
+                var sv = db.sinhviens.FirstOrDefault(s => s.masv == txtMaSV.Text.Trim());
+                if (sv == null)
+                {
+                    MessageBox.Show("Không tìm thấy sinh viên.", "Thông báo",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                sv.hoten = txtHoTen.Text.Trim();
+                sv.gioitinh = cboGioiTinh.Text;
+                sv.ngaysinh = dtNgaySinh.Value.Date;
+                sv.lophoc_id = cboLop.SelectedValue != null
+                    ? (int?)Convert.ToInt32(cboLop.SelectedValue)
+                    : null;
+                db.SubmitChanges();
+                MessageBox.Show("Sửa sinh viên thành công!", "Thành công",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LoadDanhSach(txtTimKiem.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
     }
 }
