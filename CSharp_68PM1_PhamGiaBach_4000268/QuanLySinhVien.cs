@@ -101,29 +101,7 @@ namespace Quanlisinhvien
             if (cboGioiTinh.Items.Count > 0) cboGioiTinh.SelectedIndex = 0;
             if (cboLop.Items.Count > 0) cboLop.SelectedIndex = 0;
         }
-        private void dgvSinhVien_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex < 0) return;
-            var row = dgvSinhVien.Rows[e.RowIndex];
-            txtMaSV.Text = row.Cells[0].Value?.ToString();
-            txtMaSV.ReadOnly = true;
-            txtMaSV.BackColor = System.Drawing.Color.FromArgb(230, 230, 230);
-            txtHoTen.Text = row.Cells[1].Value?.ToString();
-            cboGioiTinh.Text = row.Cells[2].Value?.ToString();
-            string nsStr = row.Cells[3].Value?.ToString();
-            if (DateTime.TryParseExact(nsStr, "dd/MM/yyyy",
-                CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt))
-                dtNgaySinh.Value = dt;
-            // Chọn lớp tương ứng
-            string maLop = row.Cells[4].Value?.ToString();
-            try
-            {
-                db = new DataClasses1DataContext();
-                var lop = db.lophocs.FirstOrDefault(l => l.malop == maLop);
-                if (lop != null) cboLop.SelectedValue = lop.id;
-            }
-            catch { }
-        }
+
         private void btnThem_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtMaSV.Text) || string.IsNullOrWhiteSpace(txtHoTen.Text))
@@ -163,6 +141,7 @@ namespace Quanlisinhvien
                 MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         private void btnSua_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtMaSV.Text))
@@ -197,6 +176,7 @@ namespace Quanlisinhvien
                 MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         private void btnXoa_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtMaSV.Text))
@@ -239,6 +219,55 @@ namespace Quanlisinhvien
             LoadDanhSach(txtTimKiem.Text);
         }
 
+        private void txtTimKiem_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter) btnTim_Click(sender, e);
+        }
 
+        private void dgvSinhVien_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            var row = dgvSinhVien.Rows[e.RowIndex];
+            txtMaSV.Text = row.Cells[0].Value?.ToString();
+            txtMaSV.ReadOnly = true;
+            txtMaSV.BackColor = System.Drawing.Color.FromArgb(230, 230, 230);
+            txtHoTen.Text = row.Cells[1].Value?.ToString();
+            cboGioiTinh.Text = row.Cells[2].Value?.ToString();
+            string nsStr = row.Cells[3].Value?.ToString();
+            if (DateTime.TryParseExact(nsStr, "dd/MM/yyyy",
+                CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt))
+                dtNgaySinh.Value = dt;
+            // Chọn lớp tương ứng
+            string maLop = row.Cells[4].Value?.ToString();
+            try
+            {
+                db = new DataClasses1DataContext();
+                var lop = db.lophocs.FirstOrDefault(l => l.malop == maLop);
+                if (lop != null) cboLop.SelectedValue = lop.id;
+            }
+            catch { }
+        }
+
+        private void btnFirst_Click(object sender, EventArgs e)
+        {
+            currentPage = 1;
+            LoadDanhSach(txtTimKiem.Text);
+        }
+
+        private void btnPrev_Click(object sender, EventArgs e)
+        {
+            if (currentPage > 1) { currentPage--; LoadDanhSach(txtTimKiem.Text); }
+        }
+
+        private void btnNext_Click(object sender, EventArgs e)
+        {
+            if (currentPage < totalPages) { currentPage++; LoadDanhSach(txtTimKiem.Text); }
+        }
+
+        private void btnLast_Click(object sender, EventArgs e)
+        {
+            currentPage = totalPages;
+            LoadDanhSach(txtTimKiem.Text);
+        }
     }
 }
