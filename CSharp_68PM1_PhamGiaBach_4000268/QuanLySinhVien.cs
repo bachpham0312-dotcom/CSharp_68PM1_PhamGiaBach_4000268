@@ -1,108 +1,144 @@
-﻿using System;
+using System;
+using System.Globalization;
+using System.Linq;
 using System.Windows.Forms;
+using CSharp_68PM1_PhamGiaBach_4000268;
 
-namespace QLSV
+namespace Quanlisinhvien
 {
-    public partial class QuanLySinhVien : Form
+    public partial class QuanliSinhVien_Page : UserControl
     {
-        public QuanLySinhVien()
+        private DataClasses1DataContext db;
+        private const int pageSize = 10;
+        private int currentPage = 1;
+        private int totalPages = 1;
+        private System.Collections.Generic.List<sinhvien> danhSach = new System.Collections.Generic.List<sinhvien>();
+
+        public QuanliSinhVien_Page()
         {
             InitializeComponent();
-            LoadDuLieuMau();
+            LoadLopHoc();
+            LoadDanhSach();
         }
 
-        private void LoadDuLieuMau()
+        public void SetFilter(string maLop)
         {
-            dgvSinhVien.Rows.Add("1", "Hieu", "Nam", "11/03/2026", "68PM1");
-            dgvSinhVien.Rows.Add("2", "Nguyễn Văn B", "Nam", "11/03/2026", "68PM2");
-            dgvSinhVien.Rows.Add("3", "Trần Văn C", "Nam", "21/03/2026", "68PM2");
+            txtTimKiem.Text = maLop;
+            currentPage = 1;
+            LoadDanhSach(maLop);
         }
 
-        
+        private void LoadLopHoc()
+        {
+            try
+            {
+                db = new DataClasses1DataContext();
+                var lops = db.lophocs
+                    .Select(l => new { id = l.id, display = l.malop + " – " + l.tenlop })
+                    .ToList();
+                cboLop.DataSource = lops;
+                cboLop.DisplayMember = "display";
+                cboLop.ValueMember = "id";
+                cboLop.SelectedIndex = -1;
+            }
+            catch { }
+        }
+
+        private void LoadDanhSach(string keyword = "")
+        {
+            try
+            {
+                db = new DataClasses1DataContext();
+                var query = db.sinhviens.AsEnumerable();
+
+                if (!string.IsNullOrWhiteSpace(keyword))
+                {
+                    string kw = keyword.Trim().ToLower();
+                    query = query.Where(s =>
+                        (s.hoten != null && s.hoten.ToLower().Contains(kw)) ||
+                        (s.masv != null && s.masv.ToLower().Contains(kw)) ||
+                        (s.lophoc != null && s.lophoc.malop.ToLower().Contains(kw)));
+                }
+
+                danhSach = query.ToList();
+                int total = danhSach.Count;
+                totalPages = Math.Max(1, (int)Math.Ceiling(total / (double)pageSize));
+                if (currentPage > totalPages) currentPage = totalPages;
+
+                var page = danhSach
+                    .Skip((currentPage - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                dgvSinhVien.Rows.Clear();
+                foreach (var sv in page)
+                {
+                    string tenLop = sv.lophoc?.malop ?? "";
+                    dgvSinhVien.Rows.Add(
+                        sv.masv,
+                        sv.hoten,
+                        sv.gioitinh,
+                        sv.ngaysinh?.ToString("dd/MM/yyyy"),
+                        tenLop);
+                }
+
+                lblTrang.Text = $"Trang {currentPage}/{totalPages}  |  {total} bản ghi";
+            }
+            catch (Exception ex)
+            {
+                lblTrang.Text = "Lỗi tải dữ liệu";
+                MessageBox.Show("Lỗi kết nối CSDL: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void LamMoiForm()
+        {
+            txtMaSV.Clear();
+            txtMaSV.ReadOnly = false;
+            txtMaSV.BackColor = System.Drawing.Color.White;
+            txtHoTen.Clear();
+            dtNgaySinh.Value = DateTime.Now;
+            if (cboGioiTinh.Items.Count > 0) cboGioiTinh.SelectedIndex = 0;
+            if (cboLop.Items.Count > 0) cboLop.SelectedIndex = 0;
+        }
 
         private void btnThem_Click(object sender, EventArgs e)
         {
-            dgvSinhVien.Rows.Add(txtMaSV.Text, txtHoTen.Text, cboGioiTinh.Text, dtNgaySinh.Text, cboLop.Text);
-            MessageBox.Show("Thêm sinh viên thành công");
-        }
-
-        private void btnXoa_Click(object sender, EventArgs e)
-        {
-            if (dgvSinhVien.CurrentRow != null)
+            if (string.IsNullOrWhiteSpace(txtMaSV.Text) || string.IsNullOrWhiteSpace(txtHoTen.Text))
             {
-                dgvSinhVien.Rows.Remove(dgvSinhVien.CurrentRow);
-                MessageBox.Show("Xóa sinh viên thành công");
+                MessageBox.Show("Vui lòng nhập đầy đủ Mã SV và Họ tên.", "Thông báo",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
-        }
-
-        private void btnLamMoi_Click(object sender, EventArgs e)
-        {
-            txtMaSV.Clear();
-            txtHoTen.Clear();
-            cboGioiTinh.SelectedIndex = -1;
-            cboLop.SelectedIndex = -1;
-            dtNgaySinh.Value = DateTime.Now;
-        }
-
-        private void btnSua_Click(object sender, EventArgs e)
-        {
-            if (dgvSinhVien.CurrentRow != null)
+            try
             {
-                dgvSinhVien.CurrentRow.Cells[0].Value = txtMaSV.Text;
-                dgvSinhVien.CurrentRow.Cells[1].Value = txtHoTen.Text;
-                dgvSinhVien.CurrentRow.Cells[2].Value = cboGioiTinh.Text;
-                dgvSinhVien.CurrentRow.Cells[3].Value = dtNgaySinh.Text;
-                dgvSinhVien.CurrentRow.Cells[4].Value = cboLop.Text;
-                MessageBox.Show("Sửa sinh viên thành công");
-            }
-        }
-
-        private void dgvSinhVien_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0)
-            {
-                DataGridViewRow row = dgvSinhVien.Rows[e.RowIndex];
-                txtMaSV.Text = row.Cells[0].Value?.ToString();
-                txtHoTen.Text = row.Cells[1].Value?.ToString();
-                cboGioiTinh.Text = row.Cells[2].Value?.ToString();
-                dtNgaySinh.Text = row.Cells[3].Value?.ToString();
-                cboLop.Text = row.Cells[4].Value?.ToString();
-            }
-        }
-
-        private void btnTim_Click(object sender, EventArgs e)
-        {
-            string tukhoa = txtTimKiem.Text.ToLower();
-            foreach (DataGridViewRow row in dgvSinhVien.Rows)
-            {
-                if (row.Cells[1].Value != null)
+                db = new DataClasses1DataContext();
+                if (db.sinhviens.Any(s => s.masv == txtMaSV.Text.Trim()))
                 {
-                    string hoten = row.Cells[1].Value.ToString().ToLower();
-                    if (hoten.Contains(tukhoa))
-                    {
-                        row.Selected = true;
-                        dgvSinhVien.FirstDisplayedScrollingRowIndex = row.Index;
-                        return;
-                    }
+                    MessageBox.Show("Mã sinh viên đã tồn tại!", "Lỗi",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
+                var sv = new sinhvien
+                {
+                    masv = txtMaSV.Text.Trim(),
+                    hoten = txtHoTen.Text.Trim(),
+                    gioitinh = cboGioiTinh.Text,
+                    ngaysinh = dtNgaySinh.Value.Date,
+                    lophoc_id = cboLop.SelectedValue != null
+                        ? (int?)Convert.ToInt32(cboLop.SelectedValue)
+                        : null
+                };
+                db.sinhviens.InsertOnSubmit(sv);
+                db.SubmitChanges();
+                MessageBox.Show("Thêm sinh viên thành công!", "Thành công",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LoadDanhSach(txtTimKiem.Text);
+                LamMoiForm();
             }
-            MessageBox.Show("Không tìm thấy sinh viên");
-        }
-
-  
-
-        private void menuLopHoc_Click(object sender, EventArgs e)
-        {
-            
-            MessageBox.Show("Bạn vừa nhấn vào Quản lý Lớp Học");
-        }
-
-        private void menuDangXuat_Click(object sender, EventArgs e)
-        {
-            DialogResult result = MessageBox.Show("Bạn có muốn đăng xuất không?", "Thông báo", MessageBoxButtons.YesNo);
-            if (result == DialogResult.Yes)
+            catch (Exception ex)
             {
-                this.Close();
+                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

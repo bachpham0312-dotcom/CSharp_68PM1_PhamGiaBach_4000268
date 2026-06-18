@@ -1,98 +1,64 @@
-﻿using System;
+using System;
+using System.Linq;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using CSharp_68PM1_PhamGiaBach_4000268;
 
-namespace QuanLySinhVien
+namespace Quanlisinhvien
 {
-    public partial class QuanLyLopHoc : Form
+    public partial class QuanliLopHoc_Page : UserControl
     {
-        public QuanLyLopHoc()
+        private DataClasses1DataContext db;
+        private const int pageSize = 10;
+        private int currentPage = 1;
+        private int totalPages = 1;
+        private System.Collections.Generic.List<lophoc> danhSach = new System.Collections.Generic.List<lophoc>();
+
+        public event EventHandler<string> XemSinhVienRequest;
+
+        public QuanliLopHoc_Page()
         {
             InitializeComponent();
-            LoadData();
+            LoadDanhSach();
         }
 
-        private void LoadData()
+        private void LoadDanhSach(string keyword = "")
         {
-            dataGridView1.Rows.Add("1", "68PM1", "Lớp 68PM1", "abc");
-            dataGridView1.Rows.Add("2", "68PM2", "Lớp 68PM2", "xyz");
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            dataGridView1.Rows.Add(textBox1.Text, textBox2.Text, textBox4.Text, textBox5.Text);
-            MessageBox.Show("Thêm thành công");
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            if (dataGridView1.CurrentRow != null)
+            try
             {
-                dataGridView1.CurrentRow.Cells[0].Value = textBox1.Text;
-                dataGridView1.CurrentRow.Cells[1].Value = textBox2.Text;
-                dataGridView1.CurrentRow.Cells[2].Value = textBox4.Text;
-                dataGridView1.CurrentRow.Cells[3].Value = textBox5.Text;
-                MessageBox.Show("Sửa thành công");
-            }
-        }
+                db = new DataClasses1DataContext();
+                var query = db.lophocs.AsEnumerable();
 
-        private void button3_Click(object sender, EventArgs e)
-        {
-            if (dataGridView1.CurrentRow != null)
-            {
-                dataGridView1.Rows.Remove(dataGridView1.CurrentRow);
-                MessageBox.Show("Xóa thành công");
-            }
-        }
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-            textBox1.Clear();
-            textBox2.Clear();
-            textBox4.Clear();
-            textBox5.Clear();
-        }
-
-        private void button5_Click(object sender, EventArgs e)
-        {
-            string tuKhoa = textBox3.Text.ToLower();
-            foreach (DataGridViewRow row in dataGridView1.Rows)
-            {
-                if (row.Cells[0].Value != null)
+                if (!string.IsNullOrWhiteSpace(keyword))
                 {
-                    bool timThay = row.Cells[0].Value.ToString().ToLower().Contains(tuKhoa) ||
-                                   row.Cells[1].Value.ToString().ToLower().Contains(tuKhoa) ||
-                                   row.Cells[2].Value.ToString().ToLower().Contains(tuKhoa);
-                    row.Visible = timThay;
+                    string kw = keyword.Trim().ToLower();
+                    query = query.Where(l =>
+                        (l.id.ToString().Contains(kw)) ||
+                        (l.malop != null && l.malop.ToLower().Contains(kw)) ||
+                        (l.tenlop != null && l.tenlop.ToLower().Contains(kw)));
                 }
+
+                danhSach = query.ToList();
+                int total = danhSach.Count;
+                totalPages = Math.Max(1, (int)Math.Ceiling(total / (double)pageSize));
+                if (currentPage > totalPages) currentPage = totalPages;
+
+                var page = danhSach
+                    .Skip((currentPage - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                dgvLopHoc.Rows.Clear();
+                foreach (var lop in page)
+                    dgvLopHoc.Rows.Add(lop.id, lop.malop, lop.tenlop, lop.ghichu);
+
+                lblTrang.Text = $"Trang {currentPage}/{totalPages}  |  {total} bản ghi";
             }
-        }
-
-        private void button10_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("Danh sách sinh viên");
-        }
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex >= 0)
+            catch (Exception ex)
             {
-                DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
-                textBox1.Text = row.Cells[0].Value?.ToString();
-                textBox2.Text = row.Cells[1].Value?.ToString();
-                textBox4.Text = row.Cells[2].Value?.ToString();
-                textBox5.Text = row.Cells[3].Value?.ToString();
+                lblTrang.Text = "Lỗi tải dữ liệu";
+                MessageBox.Show("Lỗi kết nối CSDL: " + ex.Message, "Lỗi",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-
-        private void menuSinhVien_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void menuDangXuat_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
         }
     }
 }

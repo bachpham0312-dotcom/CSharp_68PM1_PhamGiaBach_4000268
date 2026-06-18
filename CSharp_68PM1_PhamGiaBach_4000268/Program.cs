@@ -1,7 +1,7 @@
-﻿using System;
+using System;
 using System.Windows.Forms;
 
-namespace QuanLySinhVien
+namespace Quanlisinhvien
 {
     internal static class Program
     {
@@ -9,10 +9,8 @@ namespace QuanLySinhVien
         static void Main()
         {
             Application.EnableVisualStyles();
-
             Application.SetCompatibleTextRenderingDefault(false);
-
-            Application.Run(new QLSV.QuanLySinhVien());
+            Application.Run(new DangNhapSinhVien());
         }
     }
 }
